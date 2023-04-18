@@ -39,8 +39,52 @@ In the main project directory:
 2. clone or download the repository
 3. cd to the main project directory(that contains `manage.py`)
 4. run `sudo bash setup.sh` with options(checkout the `setup.sh` for options)
-    a. if some downloads are slow, you can always download manually and upload to your server
+    - if some downloads are slow, you can always download manually and upload to your server
 5. restart apache: `sudo service apache2 restart`
+
+## API definition
+
+- `/`: view the homepage, used to test that apache is configured successfully
+- `/txt2img/`: try the txt2img with stable diffusion
+```
+// request
+task_id: required string,
+model: optional string, // change model with this param
+prompt: optional string,
+negative_prompt: optional string,
+sampler_name: optional string,
+steps: optional int, // default=20
+cfg_scale: optional int, // default=8
+width: optional int, // default=512
+height: optional int, // default=768
+seed: optional int // default=-1
+
+// response
+images: list<string>, // image base64 data list
+parameters: string
+```
+
+- `/progress/`: get the generation progress
+```
+// request
+task_id: required string
+
+// response
+progress: float, // progress percentage
+eta: float, // eta seconds
+```
+
+- `/interrupt/`: terminate an unfinished generation
+```
+// request
+task_id: required string
+```
+
+- `/list_models/`: list available models
+```
+// response
+models: list<string>
+```
 
 # Deploy the load-balancing server
 
