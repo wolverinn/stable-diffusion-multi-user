@@ -48,6 +48,7 @@ In the main project directory:
 2. clone or download the repository
 3. cd to the main project directory(that contains `manage.py`)
 4. run `sudo bash setup.sh lb`
-5. restart apache: `sudo service apache2 restart`
+5. run `mv sd_multi/urls.py sd_multi/urls1.py && mv sd_multi/urls_lb.py sd_multi/urls.py`
+6. restart apache: `sudo service apache2 restart`
 
 Finally, you can call your http API(test it using postman).
