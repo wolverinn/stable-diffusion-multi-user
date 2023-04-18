@@ -47,7 +47,7 @@ In the main project directory:
 - `/`: view the homepage, used to test that apache is configured successfully
 - `/txt2img/`: try the txt2img with stable diffusion
 ```
-// request
+// demo request
 task_id: required string,
 model: optional string, // change model with this param
 prompt: optional string,
@@ -58,6 +58,8 @@ cfg_scale: optional int, // default=8
 width: optional int, // default=512
 height: optional int, // default=768
 seed: optional int // default=-1
+// ...
+// modify views.py for more optional parameters
 
 // response
 images: list<string>, // image base64 data list
