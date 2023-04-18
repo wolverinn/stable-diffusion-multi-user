@@ -8,6 +8,7 @@
     - check generating progress
     - interrupt generating
     - list available models
+    - change models
     - ...
 - supports civitai models and lora, etc.
 - supports multi-user queuing
@@ -18,7 +19,7 @@ You can build your own UI, community features, account login&payment, etc. based
 
 # Project directory structure
 
-The project can be roughly divided into two parts: django server code, and stable-diffusion-webui code that we use to initialize and run models. And I'll mainly explain the django server part.
+The project can be roughly divided into two parts: django server code, and [stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui) code that we use to initialize and run models. And I'll mainly explain the django server part.
 
 In the main project directory:
 
@@ -34,4 +35,19 @@ In the main project directory:
 
 # Deploy on a GPU server
 
+1. SSH to the GPU server
+2. clone or download the repository
+3. cd to the main project directory(that contains `manage.py`)
+4. run `sudo bash setup.sh` with options(checkout the `setup.sh` for options)
+    a. if some downloads are slow, you can always download manually and upload to your server
+5. restart apache: `sudo service apache2 restart`
+
 # Deploy the load-balancing server
+
+1. SSH to a CPU server
+2. clone or download the repository
+3. cd to the main project directory(that contains `manage.py`)
+4. run `sudo bash setup.sh lb`
+5. restart apache: `sudo service apache2 restart`
+
+Finally, you can call your http API(test it using postman).

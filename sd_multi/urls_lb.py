@@ -18,19 +18,19 @@ from django.urls import path
 from simple import views, lb_views
 
 # single GPU machine
-urlpatterns = [
-    path('/', views.homepage),
-    # web tti
-    path('txt2img/', views.txt2img),
-    path('progress/', views.progress),
-    path('interrupt/', views.interrupt),
-    path('list_models/', views.list_models),
-]
+# urlpatterns = [
+#     path('/', views.homepage),
+#     # web tti
+#     path('txt2img/', views.txt2img),
+#     path('progress/', views.progress),
+#     path('interrupt/', views.interrupt),
+#     path('list_models/', views.list_models),
+# ]
 
 # load balancing
-# urlpatterns = [
-#     path('txt2img/', lb_views.txt2img),
-#     path('progress/', lb_views.progress),
-#     path('interrupt/', lb_views.interrupt),
-#     path('list_models/', lb_views.list_models),
-# ]
+urlpatterns = [
+    path('txt2img/', lb_views.txt2img),
+    path('progress/', lb_views.progress),
+    path('interrupt/', lb_views.interrupt),
+    path('list_models/', lb_views.list_models),
+]
