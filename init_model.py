@@ -43,6 +43,7 @@ import modules.ui
 from modules import modelloader
 from modules.shared import cmd_opts
 import modules.hypernetworks.hypernetwork
+from modules import extra_networks, extra_networks_hypernet
 
 
 def initialize():
@@ -91,8 +92,8 @@ def initialize():
     # ui_extra_networks.register_page(ui_extra_networks_hypernets.ExtraNetworksPageHypernetworks())
     # ui_extra_networks.register_page(ui_extra_networks_checkpoints.ExtraNetworksPageCheckpoints())
 
-    # extra_networks.initialize()
-    # extra_networks.register_extra_network(extra_networks_hypernet.ExtraNetworkHypernet())
+    extra_networks.initialize()
+    extra_networks.register_extra_network(extra_networks_hypernet.ExtraNetworkHypernet())
 
     # if cmd_opts.tls_keyfile is not None and cmd_opts.tls_keyfile is not None:
 

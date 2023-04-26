@@ -9,11 +9,12 @@ import threading
 
 from modules.processing import StableDiffusionProcessingTxt2Img, StableDiffusionProcessingImg2Img, process_images
 from modules.api.api import encode_pil_to_base64_str
-from modules import shared, sd_models
+import modules
 
 # Create your views here.
 
 initialize()
+modules.script_callbacks.before_ui_callback()
 queue_lock = threading.Lock() # 一台机器只能同时处理一个请求，所以这个lock是全局的
 
 # class _txt2img_request(BaseModel):
