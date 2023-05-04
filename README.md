@@ -95,6 +95,7 @@ models: list<string>
 3. cd to the main project directory(that contains `manage.py`)
 4. run `sudo bash setup.sh lb`
 5. run `mv sd_multi/urls.py sd_multi/urls1.py && mv sd_multi/urls_lb.py sd_multi/urls.py`
-6. restart apache: `sudo service apache2 restart`
+6. modify `ip_list` variable with your own server ip+port in `simple/lb_views.py`
+7. restart apache: `sudo service apache2 restart`
 
 Finally, you can call your http API(test it using postman).
