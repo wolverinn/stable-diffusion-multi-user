@@ -63,7 +63,7 @@ def initialize():
     gfpgan.setup_model(cmd_opts.gfpgan_models_path)
 
     modelloader.list_builtin_upscalers()
-    # modules.scripts.load_scripts()
+    modules.scripts.load_scripts()
     modelloader.load_upscalers()
 
     modules.sd_vae.refresh_vae_list()
