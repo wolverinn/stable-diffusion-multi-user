@@ -19,7 +19,7 @@ from simple import views, lb_views
 
 # single GPU machine
 urlpatterns = [
-    path('/', views.homepage),
+    path('home/', views.homepage),
     # web tti
     path('txt2img/', views.txt2img),
     path('progress/', views.progress),

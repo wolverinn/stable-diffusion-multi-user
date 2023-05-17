@@ -31,7 +31,7 @@ conf_raw = '''
     </Directory>
 </VirtualHost>
 
-# WSGIPythonHome {venv}
+WSGIPythonHome {venv}
 '''.format(GLOBAL = "{GLOBAL}", wsgi=wsgi_path, static=static_path, main=main_path, venv=venv_path)
 
 # print(conf_raw)
@@ -46,8 +46,8 @@ except:
 shutil.move(conf_file, "/etc/apache2/sites-available")
 
 # authorize
-os.system("chmod -R 644 {}".format(main_path))
-os.system("find {} -type d | xargs chmod 755".format(main_path))
+# os.system("chmod -R 644 {}".format(main_path))
+# os.system("find {} -type d | xargs chmod 755".format(main_path))
 
 os.system("service apache2 reload")
 os.system("a2dissite 000-default && a2ensite {}".format(django_project_name))

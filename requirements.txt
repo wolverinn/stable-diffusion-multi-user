@@ -9,7 +9,7 @@ Pillow==9.4.0
 realesrgan==0.3.0
 # !!!!option1: if you use huggingface, you should use the following lines
 # !!!!option2: if you use lightning ai, you should comment the following lines
-lightning-api-access
+# lightning-api-access
 # torch==1.13.1+cu117
 # --extra-index-url https://download.pytorch.org/whl/cu117
 # torchvision==0.14.1+cu117
@@ -34,5 +34,8 @@ torchsde==0.2.5
 safetensors==0.2.7
 httpcore<=0.15
 fastapi==0.90.1
-git+https://github.com/mlfoundations/open_clip.git@bb6e834e9c70d9c27d0dc3ecedeebeaeb1ffad6b
+xformers==0.0.16rc425
+open_clip_torch==2.14.0
+gdown==4.5.1
+# git+https://github.com/mlfoundations/open_clip.git@bb6e834e9c70d9c27d0dc3ecedeebeaeb1ffad6b
 git+https://github.com/openai/CLIP.git@d50d76daa670286dd6cacf3bcd80b5e4823fc8e1
