@@ -37,7 +37,7 @@ elif [ $1 == "apache" ]; then
     find stable-diffusion-multi-user -type d | xargs chmod 755
     chmod g+w stable-diffusion-multi-user
     chmod g+w -R stable-diffusion-multi-user/venv
-    cd .. # pwd = /var
+    cd /var # pwd = /var
     # 下面两行是因为sd需要在/var/www下创建.cache文件夹进行写入
     chgrp www-data www/
     chmod g+w www/

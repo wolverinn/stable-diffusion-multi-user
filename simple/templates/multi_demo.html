@@ -1,0 +1,292 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <title>stable diffusion multi user</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://code.jquery.com/ui/1.13.0/themes/smoothness/jquery-ui.css"
+    />
+    <script>
+      let disable_btn = false;
+      $(document).ready(function () {
+        $("#prompt").keypress(function (event) {
+          if (event.keyCode === 13 && !disable_btn) {
+            event.preventDefault();
+            generate();
+          }
+        });
+      });
+    </script>
+    <script>
+      function disableBtn() {
+        $(".submit-btn").prop("disabled", true);
+        $(".submit-btn").css("background-color", "grey");
+        $(".submit-btn").css("cursor", "auto");
+        $(".submit-btn:hover").css("background-color", "grey");
+        disable_btn = true;
+        $(".submit-btn").text("generating...");
+      }
+      function enableBtn() {
+        $(".submit-btn").prop("disabled", false);
+        $(".submit-btn").css("background-color", "rgb(12, 137, 246)");
+        $(".submit-btn").css("cursor", "pointer");
+        $(".submit-btn:hover").css("background-color", "darkblue");
+        disable_btn = false;
+        $(".submit-btn").text("Send");
+      }
+      function processErr(err) {
+        if (err == "need_verify") {
+          $("#dialog-confirm").dialog("open");
+        } else {
+          alert(err);
+        }
+        return;
+      }
+      let task_id = 1;
+      function generate() {
+        disableBtn();
+
+        var prompt = $("#prompt").val();
+        $.ajax({
+          url: "/txt2img/",
+          type: "POST",
+          dataType: "json",
+          data: JSON.stringify({
+            prompt: prompt,
+            task_id: task_id.toString(),
+          }),
+          success: function (response) {
+            console.log("generate success, resp: ", response);
+            task_id += 1;
+            if ("err" in response && response["err"] != "") {
+              enableBtn();
+              return processErr(response["err"]);
+            }
+            const image = new Image();
+
+            image.src = "data:image/png;base64," + response["images"][0];
+
+            image.onload = function () {
+              $("#image-container").empty().append(image);
+              $(image).on("click", function () {
+                $.fancybox.open({
+                  src: this.src,
+                  type: "image",
+                });
+              });
+            };
+            enableBtn();
+          },
+          error: function (xhr, status, error) {
+            console.error("Ajax error：", error);
+            task_id += 1;
+            enableBtn();
+            alert("generate error");
+          },
+        });
+      }
+      function generate_fallbck() {
+        disableBtn();
+        var prompt = $("#prompt").val();
+        $.ajax({
+          url: "/txt2img_fallback/",
+          type: "POST",
+          dataType: "json",
+          data: JSON.stringify({
+            prompt: prompt,
+            task_id: task_id.toString(),
+          }),
+          success: function (response) {
+            console.log("generate success, resp: ", response);
+            task_id += 1;
+            if ("err" in response && response["err"] != "") {
+              enableBtn();
+              return processErr(response["err"]);
+            }
+            const image = new Image();
+
+            image.src = response["img_data"];
+
+            image.onload = function () {
+              $("#image-container").empty().append(image);
+              $(image).on("click", function () {
+                $.fancybox.open({
+                  src: this.src,
+                  type: "image",
+                });
+              });
+            };
+            enableBtn();
+          },
+          error: function (xhr, status, error) {
+            console.error("Ajax error：", error);
+            task_id += 1;
+            enableBtn();
+            alert("generate error");
+          },
+        });
+      }
+      function listmodel() {
+        $.ajax({
+          url: "/list_models/",
+          type: "POST",
+          dataType: "json",
+          data: {},
+          success: function (response) {
+            console.log("generate success, resp: ", response);
+            if ("err" in response && response["err"] != "") {
+              return processErr(response["err"]);
+            }
+            $("#model-name").empty();
+            for (let index = 0; index < response["models"].length; index++) {
+              $("#model-name").append(response["models"][index] + "<br/>");
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error("Ajax error：", error);
+            alert("generate error");
+          },
+        });
+      }
+      function progress() {
+        $.ajax({
+          url: "/progress/",
+          type: "POST",
+          dataType: "json",
+          data: JSON.stringify({
+            task_id: task_id.toString(),
+          }),
+          success: function (response) {
+            console.log("generate success, resp: ", response);
+            if ("err" in response && response["err"] != "") {
+              //   enableBtn();
+              return processErr(response["err"]);
+            }
+            $("#pg")
+              .empty()
+              .append("progress：" + response["progress"] + "%");
+            $("#eta")
+              .empty()
+              .append("eta(seconds)" + response["eta"]);
+          },
+          error: function (xhr, status, error) {
+            console.error("Ajax error：", error);
+            // enableBtn();
+            alert("generate error");
+          },
+        });
+      }
+    </script>
+    <style>
+      body {
+        background-color: #212121;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 50vh;
+        margin: 0;
+      }
+
+      .page-element {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto;
+        font-family: Arial, sans-serif;
+        /* text-align: left; */
+      }
+
+      #input-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 10px;
+        /* margin-top: 10px; */
+      }
+      .input_text {
+        width: 360px;
+        height: 110px;
+        border-style: double;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        font-size: 15px;
+        color: rgb(133, 138, 138);
+        display: inline-block;
+        background-color: #424242;
+        border-color: #f5f5f5;
+        padding: 10px;
+        line-height: 1.5;
+        resize: none;
+      }
+
+      .submit-btn,
+      .submit-btn1,
+      .submit-btn2 {
+        background-color: rgb(12, 137, 246);
+        color: white;
+        font-weight: bold;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        cursor: pointer;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+
+      .submit-btn:hover {
+        background-color: #0069d9;
+      }
+
+      #image-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding-top: 2%;
+        max-width: 360px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-element">
+      <h1>Multi-User SD demo</h1>
+      <div id="input-box">
+        <textarea
+          type="text"
+          id="prompt"
+          class="input_text"
+          placeholder="please input english prompt"
+        ></textarea>
+        <button onclick="generate()" class="submit-btn" autocomplete="false">
+          generate
+        </button>
+        <button
+          onclick="generate_fallbck()"
+          class="submit-btn"
+          autocomplete="false"
+        >
+          generate with fallback
+        </button>
+      </div>
+      <div id="image-container"></div>
+      <div id="list-model">
+        <button onclick="listmodel()" class="submit-btn1" autocomplete="false">
+          get model list
+        </button>
+      </div>
+      <div id="model-name"></div>
+      <div id="progress">
+        <button onclick="progress()" class="submit-btn2" autocomplete="false">
+          check progress
+        </button>
+        <div id="pg"></div>
+        <div id="eta"></div>
+      </div>
+    </div>
+  </body>
+</html>

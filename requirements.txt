@@ -37,5 +37,6 @@ fastapi==0.90.1
 xformers==0.0.16rc425
 open_clip_torch==2.14.0
 gdown==4.5.1
+replicate
 # git+https://github.com/mlfoundations/open_clip.git@bb6e834e9c70d9c27d0dc3ecedeebeaeb1ffad6b
 git+https://github.com/openai/CLIP.git@d50d76daa670286dd6cacf3bcd80b5e4823fc8e1

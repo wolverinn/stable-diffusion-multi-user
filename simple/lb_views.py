@@ -7,23 +7,32 @@ import json
 import threading
 import requests
 import sys
+import replicate
 
 # load balancing views
 # 假设有10台GPU机器，因为用户的task是在某一台机器上生成的，这10台机器之间并没有做分布式同步
 # 所以一旦用户请求到了某一台GPU机器，后续获取进度/停止生成等操作都需要访问这台特定的GPU机器
 # 所以在session中记录访问的GPU机器ip，直到请求结束后一段时间再释放
 
+# ================ IMPORTANT: fill the configs below ======================
 ip_list = {
     "1.1.1.1": {},
     "2.2.2.2": {},
 }
+REPLICATE_API_TOKEN = ""
+# =========================================================================
 
 KEEP_ALIVE_SECONDS = 60
 MAX_TIMEOUT_SECONDS = 600
 MAX_REQUESTS_PER_MACHINE = 10
 
+ERR_MAX_REQUEST = "max requests reached, try again later"
+PROMPT_MAX_LEN = 600
+
 session_key_lock = threading.Lock()
 GLOBAL_SESSION_KEY = 1
+
+os.environ["REPLICATE_API_TOKEN"] = REPLICATE_API_TOKEN
 
 def choose_machine() -> str:
     chosen_ip = ""
@@ -77,7 +86,7 @@ def routing(request, api_path: str) -> JsonResponse:
         return JsonResponse({"err": "api path empty"})
     ip = get_ip_for_session(request)
     if len(ip) <= 0:
-        return JsonResponse({"err": "max requests reached, try again later"})
+        return JsonResponse({"err": ERR_MAX_REQUEST})
     # logic here
     raw_req = request.body.decode('utf-8')
     print("formating request: {}".format(raw_req))
@@ -99,10 +108,32 @@ def routing(request, api_path: str) -> JsonResponse:
 
 # routing views
 
+def demo_page(request):
+    return render(request, "multi_demo.html")
+
 @csrf_exempt
 def txt2img(request):
     API_PATH = "txt2img/"
     return routing(request, API_PATH)
+
+@csrf_exempt
+def txt2img_with_fallback(request):
+    # returns image uri in "img_data"
+    API_PATH = "txt2img/"
+    resp = routing(request, API_PATH)
+    uri = ""
+    if resp.get("err", "") == ERR_MAX_REQUEST:
+        # fallback to replicate, but lacks:
+        # 1.progress check; 2.choose model(todo)
+        prompt = request.POST.get("prompt")
+        if len(prompt) > PROMPT_MAX_LEN:
+            prompt = prompt[:PROMPT_MAX_LEN]
+        uri = replicate_chill_watcher_generate(prompt)
+    else:
+        resp_json = json.loads(resp.content)
+        uri = 'data:image/png;base64,' + resp_json["images"][0]
+    # print("get fallback txt2img uri: ", uri)
+    return JsonResponse({"img_data": uri})
 
 
 @csrf_exempt
@@ -126,4 +157,17 @@ def get_map_default(int_map, key: str) -> int:
         return int_map[key]
     else:
         return 0
+
+
+# this is just a demo for txt2img_fallback, replace with your own replicate model
+def replicate_chill_watcher_generate(prompt: str) -> str:
+    start = time.time()
+    output = replicate.run(
+        "wolverinn/chill_watcher:53d24c51f11d93e26f88cc53a00b5c392e5eb62272e07c46152af66a14e27cae",
+        input={"prompt": prompt}
+    )
+    end = time.time()
+    print("chill watcher replicate cost(milli seconds): {}".format(end*1e3-start*1e3))
+    print("chill resp: ", output)
+    return output
 
