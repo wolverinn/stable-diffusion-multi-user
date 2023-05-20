@@ -30,11 +30,14 @@ def choose_machine() -> str:
     min_cnt = 1000000
     for ip, session_info_list in ip_list.items():
         valid_cnt = 0
+        need_del_session_keys = []
         for session_key, session_info in session_info_list.items():
             if get_map_default(session_info, "lb_expire") <= int(time.time()):
-                del ip_list[ip][session_key] # expired, need to be deleted
+                need_del_session_keys.append(session_key)
             else:
                 valid_cnt += 1
+        for session_key in need_del_session_keys:
+            del ip_list[ip][session_key] # expired, need to be deleted
         if valid_cnt <= min_cnt and valid_cnt <= MAX_REQUESTS_PER_MACHINE:
             chosen_ip = ip
             min_cnt = valid_cnt
@@ -44,6 +47,7 @@ def use_machine(request, ip):
     if ip not in ip_list.keys():
         return
     session_key = 0
+    global GLOBAL_SESSION_KEY
     with session_key_lock:
         if GLOBAL_SESSION_KEY >= sys.maxsize-1:
             GLOBAL_SESSION_KEY = 0
@@ -56,6 +60,7 @@ def use_machine(request, ip):
     ip_list[ip][session_key] = {
         "lb_expire": expire,
     }
+    print("ip list: ", ip_list)
 
 def get_ip_for_session(request) -> str:
     expire_time = request.session.get("lb_expire", 0)
@@ -75,10 +80,12 @@ def routing(request, api_path: str) -> JsonResponse:
         return JsonResponse({"err": "max requests reached, try again later"})
     # logic here
     raw_req = request.body.decode('utf-8')
+    print("formating request: {}".format(raw_req))
     resp = requests.post("http://{}/{}".format(ip, api_path), data=raw_req)
     if resp.status_code != 200:
+        print("routing err, path: {}, resp: {}".format(api_path, resp))
         return JsonResponse({"err": "internal error occurred"})
-    resp_json = json.loads(resp.content())
+    resp_json = json.loads(resp.text)
 
     # finally keep-alive here
     expire = int(time.time()) + KEEP_ALIVE_SECONDS

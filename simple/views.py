@@ -93,7 +93,9 @@ def txt2img(request):
 
 @csrf_exempt
 def progress(request):
-    task_id = request.POST.get("task_id")
+    raw_req = request.body.decode('utf-8')
+    req_json = json.loads(raw_req)
+    task_id = req_json.get("task_id", "")
     if len(task_id) <= 0:
         return JsonResponse({"err": "invalid task"})
     if shared.state.job_count == 0:
@@ -118,7 +120,9 @@ def progress(request):
 
 @csrf_exempt
 def interrupt(request):
-    task_id = request.POST.get("task_id")
+    raw_req = request.body.decode('utf-8')
+    req_json = json.loads(raw_req)
+    task_id = req_json.get("task_id", 0)
     if len(task_id) <= 0:
         return JsonResponse({"err": "invalid task"})
     if shared.state.task_id != task_id:
