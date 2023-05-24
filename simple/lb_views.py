@@ -135,6 +135,10 @@ def txt2img_with_fallback(request):
     # print("get fallback txt2img uri: ", uri)
     return JsonResponse({"img_data": uri})
 
+@csrf_exempt
+def img2img(request):
+    API_PATH = "img2img/"
+    return routing(request, API_PATH)
 
 @csrf_exempt
 def progress(request):

@@ -23,6 +23,7 @@ urlpatterns = [
     # web tti
     path('multi_demo/', lb_views.demo_page),
     path('txt2img/', views.txt2img),
+    path('img2img/', views.img2img),
     path('progress/', views.progress),
     path('interrupt/', views.interrupt),
     path('list_models/', views.list_models),
