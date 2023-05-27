@@ -29,6 +29,7 @@ from simple import views, lb_views
 
 # load balancing
 urlpatterns = [
+    path('multi_demo/', lb_views.demo_page),
     path('txt2img/', lb_views.txt2img),
     path('txt2img_fallback/', lb_views.txt2img_with_fallback),
     path('img2img/', lb_views.img2img),

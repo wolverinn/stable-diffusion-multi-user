@@ -39,7 +39,7 @@ In the main project directory:
 1. SSH to the GPU server
 2. clone or download the repository
 3. cd to the main project directory(that contains `manage.py`)
-4. run `sudo bash setup.sh` with options(checkout the `setup.sh` for options)
+4. run `sudo bash setup.sh` with options(checkout the `setup.sh` for options)(recommende order: follow the file order)
     - if some downloads are slow, you can always download manually and upload to your server
 5. restart apache: `sudo service apache2 restart`
 
@@ -126,5 +126,16 @@ models: list<string>
 5. run `mv sd_multi/urls.py sd_multi/urls1.py && mv sd_multi/urls_lb.py sd_multi/urls.py`
 6. modify `ip_list` variable with your own server ip+port in `simple/lb_views.py`
 7. restart apache: `sudo service apache2 restart`
+8. to test it, view `ip+port/multi_demo/` url path
+
+## Test the load-balancing server locally
+If you don't want to deploy the load balancing server but still want to test the functions, you can start the load-balancing server on your local computer.
+
+1. clone or download the repository
+2. requirements: python3, django, django-cors-headers, replicate
+3. modify `ip_list` variable with your own GPU server ip+port in `simple/lb_views.py`
+4. cd to the main project directory(that contains `manage.py`)
+5. run `python manage.py runserver`
+6. click the url that shows up in the terminal, view `/multi_demo/` path
 
 Finally, you can call your http API(test it using postman).

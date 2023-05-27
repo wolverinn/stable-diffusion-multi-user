@@ -46,17 +46,24 @@
         return;
       }
       let task_id = 1;
+      var timestamp = new Date().getTime();
+      var timestampInt = parseInt(timestamp / 1000);
+      function gen_task_id() {
+        return timestampInt.toString() + "_" + task_id.toString()
+      };
       function generate() {
         disableBtn();
 
         var prompt = $("#prompt").val();
+        var model_name = $("#model").val();
         $.ajax({
           url: "/txt2img/",
           type: "POST",
           dataType: "json",
           data: JSON.stringify({
             prompt: prompt,
-            task_id: task_id.toString(),
+            model: model_name,
+            task_id: gen_task_id(),
           }),
           success: function (response) {
             console.log("generate success, resp: ", response);
@@ -97,7 +104,7 @@
           dataType: "json",
           data: JSON.stringify({
             prompt: prompt,
-            task_id: task_id.toString(),
+            task_id: gen_task_id(),
           }),
           success: function (response) {
             console.log("generate success, resp: ", response);
@@ -157,7 +164,7 @@
           type: "POST",
           dataType: "json",
           data: JSON.stringify({
-            task_id: task_id.toString(),
+            task_id: gen_task_id(),
           }),
           success: function (response) {
             console.log("generate success, resp: ", response);
@@ -256,6 +263,8 @@
     <div class="page-element">
       <h1>Multi-User SD demo</h1>
       <div id="input-box">
+        <label for="model">choose model(you can leave it empty):</label>
+        <input id="model" type="text"></input>
         <textarea
           type="text"
           id="prompt"

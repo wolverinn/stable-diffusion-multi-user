@@ -25,6 +25,12 @@ elif [ $1 == "venv" ]; then
     pip3 install torch==1.13.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117
     pip3 install torchvision==0.14.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117
     deactivate
+elif [ $1 == "sd_model" ]; then
+    # download models
+    wget -P ./models/Stable-diffusion https://huggingface.co/Hardy01/chill_watcher/resolve/main/models/Stable-diffusion/chilloutmix_NiPrunedFp32Fix.safetensors
+    wget -P ./models/VAE https://huggingface.co/Hardy01/chill_watcher/resolve/main/models/VAE/vae-ft-mse-840000-ema-pruned.ckpt
+    wget -P ./models/Lora https://huggingface.co/Hardy01/chill_watcher/resolve/main/models/Lora/koreanDollLikeness_v10.safetensors
+    wget -P ./models/Lora https://huggingface.co/Hardy01/chill_watcher/resolve/main/models/Lora/taiwanDollLikeness_v10.safetensors
 elif [ $1 == "apache" ]; then
     # configure apache
     cd ..
@@ -42,12 +48,6 @@ elif [ $1 == "apache" ]; then
     chgrp www-data www/
     chmod g+w www/
     service apache2 restart
-elif [ $1 == "sd_model" ]; then
-    # download models
-    wget -P ./models/Stable-diffusion https://huggingface.co/Hardy01/chill_watcher/resolve/main/models/Stable-diffusion/chilloutmix_NiPrunedFp32Fix.safetensors
-    wget -P ./models/VAE https://huggingface.co/Hardy01/chill_watcher/resolve/main/models/VAE/vae-ft-mse-840000-ema-pruned.ckpt
-    wget -P ./models/Lora https://huggingface.co/Hardy01/chill_watcher/resolve/main/models/Lora/koreanDollLikeness_v10.safetensors
-    wget -P ./models/Lora https://huggingface.co/Hardy01/chill_watcher/resolve/main/models/Lora/taiwanDollLikeness_v10.safetensors
 elif [ $1 == "lb" ]; then
     apt-get update
     apt-get install python3-pip
@@ -57,6 +57,7 @@ elif [ $1 == "lb" ]; then
     source ./venv/bin/activate
     pip3 install django
     pip3 install django-cors-headers
+    pip3 install replicate
     python3 gen_http_conf.py
     service apache2 restart
 else 

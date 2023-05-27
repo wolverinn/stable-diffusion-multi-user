@@ -21,7 +21,6 @@ from simple import views, lb_views
 urlpatterns = [
     path('home/', views.homepage),
     # web tti
-    path('multi_demo/', lb_views.demo_page),
     path('txt2img/', views.txt2img),
     path('img2img/', views.img2img),
     path('progress/', views.progress),
