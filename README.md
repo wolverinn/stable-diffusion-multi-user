@@ -41,6 +41,7 @@ In the main project directory:
 3. cd to the main project directory(that contains `manage.py`)
 4. run `sudo bash setup.sh` with options(checkout the `setup.sh` for options)(recommende order: follow the file order)
     - if some downloads are slow, you can always download manually and upload to your server
+    - if you want to change listening ports: change both `/etc/apache2/ports.conf` and `/etc/apache2/sites-available/sd_multi.conf`
 5. restart apache: `sudo service apache2 restart`
 
 ## API definition
