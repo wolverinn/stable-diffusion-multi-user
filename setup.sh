@@ -9,6 +9,7 @@ if [ $1 == "env" ]; then
     # install system packages
     apt-get update
     apt-get install python3-pip
+    apt-get install python3-venv
     apt-get install apache2
     apt-get install libapache2-mod-wsgi-py3
     apt-get install libgl1-mesa-glx
