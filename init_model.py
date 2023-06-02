@@ -85,7 +85,7 @@ def initialize():
     shared.opts.onchange("sd_vae_as_default", wrap_queued_call(lambda: modules.sd_vae.reload_vae_weights()), call=False)
     shared.opts.onchange("temp_dir", ui_tempdir.on_tmpdir_changed)
 
-    shared.reload_hypernetworks()
+    # shared.reload_hypernetworks()
 
     # ui_extra_networks.intialize()
     # ui_extra_networks.register_page(ui_extra_networks_textual_inversion.ExtraNetworksPageTextualInversion())
