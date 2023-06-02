@@ -58,7 +58,7 @@ elif [ $1 == "lb" ]; then
     source ./venv/bin/activate
     pip3 install django
     pip3 install django-cors-headers
-    pip3 install replicate
+    pip3 install replicate==0.8.1
     python3 gen_http_conf.py
     service apache2 restart
 else 

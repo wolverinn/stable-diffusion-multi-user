@@ -18,6 +18,8 @@
 
 You can build your own UI, community features, account login&payment, etc. based on these functions!
 
+![load balancing](vx_images/516000908230643.jpg)
+
 # Project directory structure
 
 The project can be roughly divided into two parts: django server code, and [stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui) code that we use to initialize and run models. And I'll mainly explain the django server part.
