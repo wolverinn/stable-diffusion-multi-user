@@ -138,7 +138,8 @@ If you don't want to deploy the load balancing server but still want to test the
 2. requirements: python3, django, django-cors-headers, replicate
 3. modify `ip_list` variable with your own GPU server ip+port in `simple/lb_views.py`
 4. cd to the main project directory(that contains `manage.py`)
-5. run `python manage.py runserver`
-6. click the url that shows up in the terminal, view `/multi_demo/` path
+5. run `mv sd_multi/urls.py sd_multi/urls1.py` && `mv sd_multi/urls_lb.py sd_multi/urls.py`
+6. run `python manage.py runserver`
+7. click the url that shows up in the terminal, view `/multi_demo/` path
 
 Finally, you can call your http API(test it using postman).

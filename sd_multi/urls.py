@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from simple import views, lb_views
+from simple import views
 
 # single GPU machine
 urlpatterns = [
