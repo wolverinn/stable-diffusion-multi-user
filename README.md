@@ -153,4 +153,4 @@ deploy steps:
 - install docker: https://docs.docker.com/engine/install/ubuntu/#set-up-the-repository
 - cd to the project directory(which contains `Dockerfile`)
 - docker build && docker tag && docker push (these are not bash commands!)
-- create Endpoint on runpod: https://www.runpod.io/console/serverless
+- create serverless Endpoint on runpod: https://runpod.io?ref=bz40v32s
