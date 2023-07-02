@@ -20,7 +20,7 @@ elif [ $1 == "venv" ]; then
     source ./venv/bin/activate
     pip3 install django
     pip3 install django-cors-headers
-    pip3 install -r requirements.txt --extra-index-url https://pypi.tuna.tsinghua.edu.cn/simple
+    pip3 install -r requirements.txt --extra-index-url https://mirrors.aliyun.com/pypi/simple
     # python3 ./repositories/CLIP/setup.py install
     # python3 ./repositories/open_clip/setup.py install
     pip3 install torch==1.13.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117

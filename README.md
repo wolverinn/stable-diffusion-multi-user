@@ -27,6 +27,7 @@ The project can be roughly divided into two parts: django server code, and [stab
 In the main project directory:
 
 - `modules/`: stable-diffusion-webui modules
+- `models/`: stable diffusion models
 - `sd_multi/`: the django project name
     - `urls.py`: server API path configuration
 - `simple/`: the main django code
@@ -143,3 +144,13 @@ If you don't want to deploy the load balancing server but still want to test the
 7. click the url that shows up in the terminal, view `/multi_demo/` path
 
 Finally, you can call your http API(test it using postman).
+
+# Part 2: Deploy using Runpod Serverless
+Check `handler.py` where I realized a demo handler for txt2img.
+
+deploy steps:
+- get a GPU server, download this repository and model files
+- install docker: https://docs.docker.com/engine/install/ubuntu/#set-up-the-repository
+- cd to the project directory(which contains `Dockerfile`)
+- docker build && docker tag && docker push (these are not bash commands!)
+- create Endpoint on runpod: https://www.runpod.io/console/serverless
