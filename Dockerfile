@@ -21,6 +21,19 @@ RUN apt-get update && apt-get install -y git && \
     pip3 install torch==1.13.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117 && \
     pip3 install torchvision==0.14.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117
 
-COPY . /
+COPY configs* /
+COPY extensions-builtin* /
+COPY modules* /
+COPY repositories* /
+COPY scripts* /
+COPY handler.py /
+COPY config.json /
+
+COPY docker_entrypoint.sh /
+RUN chmod +x docker_entrypoint.sh
+
+# COPY . /
+
+ENTRYPOINT ["/docker_entrypoint.sh"]
 
 CMD [ "python", "-u", "/handler.py" ]

@@ -1,6 +1,5 @@
 import requests
 import time
-import os
 import json
 import base64
 
