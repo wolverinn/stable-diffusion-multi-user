@@ -11,29 +11,26 @@ FROM python:3.10-slim
 WORKDIR /
 
 COPY requirements.txt /
+# COPY torch-1.13.1+cu117-cp38-cp38-linux_x86_64.whl .
 
-RUN apt-get update && apt-get install -y libgl1-mesa-glx && \
+RUN apt-get update && apt-get install -y libgl1-mesa-glx  && \
     apt-get install -y libglib2.0-0 && \
-    pip3 install runpod 
-    
-RUN apt-get update && apt-get install -y git && \
+    apt-get install -y git && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install runpod==0.9.12 && \
     pip3 install -r requirements.txt && \
+    # pip3 install torch-1.13.1+cu117-cp38-cp38-linux_x86_64.whl && \
     pip3 install torch==1.13.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117 && \
-    pip3 install torchvision==0.14.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117
+    pip3 install torchvision==0.14.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117 && \
+    # apt-get remove -y git && \
+    # rm -rf torch-1.13.1+cu117-cp38-cp38-linux_x86_64.whl && \
+    pip3 cache purge
 
-COPY configs* /
-COPY extensions-builtin* /
-COPY modules* /
-COPY repositories* /
-COPY scripts* /
-COPY handler.py /
-COPY config.json /
-
-COPY docker_entrypoint.sh /
-RUN chmod +x docker_entrypoint.sh
+COPY . /
 
 # COPY . /
 
-ENTRYPOINT ["/docker_entrypoint.sh"]
+# ENTRYPOINT ["/docker_entrypoint.sh"]
 
 CMD [ "python", "-u", "/handler.py" ]
