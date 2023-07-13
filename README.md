@@ -146,11 +146,4 @@ If you don't want to deploy the load balancing server but still want to test the
 Finally, you can call your http API(test it using postman).
 
 # Part 2: Deploy using Runpod Serverless
-Check `handler.py` where I realized a demo handler for txt2img.
-
-deploy steps:
-- get a GPU server, download this repository and model files
-- install docker: https://docs.docker.com/engine/install/ubuntu/#set-up-the-repository
-- cd to the project directory(which contains `Dockerfile`)
-- docker build && docker tag && docker push (these are not bash commands!)
-- create serverless Endpoint on runpod: https://runpod.io?ref=bz40v32s
+see `sd-docker-slim`

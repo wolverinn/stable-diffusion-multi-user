@@ -1,0 +1,49 @@
+# 文生图
+request:
+  - api # 必传“txt2img”
+  - model # 模型名称，如“chilloutmix_NiPrunedFp32Fix.safetensors”，也可以置空
+  - prompt
+  - negative_prompt
+  - sampler_name # 如“DPM++ SDE Karras”
+  - steps # 默认20
+  - cfg_scale # 默认8
+  - width # 默认512
+  - height # 默认768
+  - seed # 不传则使用随机种子
+  - restore_faces # 布尔值
+  - hires_fix # 布尔值，是否启用hires.fix
+  - hr_denoising # 默认0.7
+  - hr_scale # 默认2.0
+  - hr_resize_x
+  - hr_resize_y
+  - hr_steps # 默认10
+  - hr_upscaler
+response:
+  - img_data # 生成的图片的base64编码
+  - parameters # 本次生成的数据，包括seed、模型名称等等
+​
+# 图生图
+request:
+  - api # 必传“img2img”
+  - model # 模型名称，如“chilloutmix_NiPrunedFp32Fix.safetensors”，也可以置空
+  - prompt
+  - negative_prompt
+  - sampler_name # 如“DPM++ SDE Karras”
+  - steps # 默认20
+  - cfg_scale # 默认8
+  - width # 默认512
+  - height # 默认768
+  - seed # 不传则使用随机种子
+  - restore_faces # 布尔值
+  - resize_mode # 默认0
+  - denoising_strength # 默认0.75
+  - init_images # 一个list，list里面的元素是输入图像的base64编码
+response:
+  - img_data # 生成的图片的base64编码
+  - parameters # 本次生成的数据，包括seed、模型名称等等
+​
+# 列出可用模型
+request:
+  - api # 必传“list_models”
+response:
+  - models # 模型名称列表
