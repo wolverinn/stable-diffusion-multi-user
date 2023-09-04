@@ -3,20 +3,18 @@
 
 Contents:
 
-- [Option-1] Deploy with Django API
-    - Project directory structure
-    - Deploy the GPU server
-        - API definition
-    - Deploy the load-balancing server
-        - Test the load-balancing server locally
-- [Option-2] Deploy using Runpod Serverless
-- [Option-3] Deploy on Replicate
+- [[Option-1] Deploy with Django API](https://github.com/wolverinn/stable-diffusion-multi-user#option-1-deploy-with-django-api)
+    - [Project directory structure](https://github.com/wolverinn/stable-diffusion-multi-user#project-directory-structure)
+    - [Deploy the GPU server](https://github.com/wolverinn/stable-diffusion-multi-user#deploy-the-gpu-server)
+    - [Deploy the load-balancing server](https://github.com/wolverinn/stable-diffusion-multi-user#deploy-the-load-balancing-server)
+- [[Option-2] Deploy using Runpod Serverless](https://github.com/wolverinn/stable-diffusion-multi-user#option-2-deploy-using-runpod-serverless)
+- [[Option-3] Deploy on Replicate](https://github.com/wolverinn/stable-diffusion-multi-user#option-3-deploy-on-replicate)
 
 --------
 
 # [Option-1] Deploy with Django API
 
-Features: 
+**Features**: 
 
 - a server code that provides stable-diffusion http API, including:
     - CHANGELOG-230904: Support torch2.0, support extension API when calling txt2img&img2img, support all API parameters same as webui
@@ -68,76 +66,7 @@ In the main project directory:
 - `/`: view the homepage, used to test that apache is configured successfully
 - `/txt2img_v2/`: txt2img with the same parameters as sd-webui, also supports extension parameters(such as controlnet)
 - `/img2img_v2/`: img2img with the same parameters as sd-webui, also supports extension parameters(such as controlnet)
-- `/txt2img/`: try the txt2img with stable diffusion
-```
-// demo request
-task_id: required string,
-model: optional string, // change model with this param
-prompt: optional string,
-negative_prompt: optional string,
-sampler_name: optional string,
-steps: optional int, // default=20
-cfg_scale: optional int, // default=8
-width: optional int, // default=512
-height: optional int, // default=768
-seed: optional int // default=-1
-restore_faces: optional int // default=0
-n_iter: optional int // default = 1
-// ...
-// modify views.py for more optional parameters
-
-// response
-images: list<string>, // image base64 data list
-parameters: string
-```
-
-- `/img2img`: stable diffusion img2img
-```
-// demo request
-task_id: required string,
-model: optional string, // change model with this param
-prompt: optional string,
-negative_prompt: optional string,
-sampler_name: optional string,
-steps: optional int, // default=20
-cfg_scale: optional int, // default=8
-width: optional int, // default=512
-height: optional int, // default=768
-seed: optional int // default=-1
-restore_faces: optional int // default=0
-n_iter: optional int // default = 1
-resize_mode: optional int // default=0
-denoising_strength: optional double // default=0.75
-init_images: optional list<base64 image data>
-// ...
-// modify views.py for more optional parameters
-
-// response
-images: list<string>, // image base64 data list
-parameters: string
-```
-
-- `/progress/`: get the generation progress
-```
-// request
-task_id: required string
-
-// response
-progress: float, // progress percentage
-eta: float, // eta seconds
-```
-
-- `/interrupt/`: terminate an unfinished generation
-```
-// request
-task_id: required string
-```
-
-- `/list_models/`: list available models
-```
-// response
-models: list<string>
-```
+- previous API version: checkout `old_django_api.md`
 
 ## Deploy the load-balancing server
 
