@@ -21,6 +21,11 @@ from simple import views
 urlpatterns = [
     path('home/', views.homepage),
     # web tti
+    path('txt2img/v2/', views.txt2img_v2),
+    path('img2img/v2/', views.img2img_v2),
+    path('progress/v2/', views.progress_v2),
+    path('interrupt/v2/', views.interrupt_v2),
+
     path('txt2img/', views.txt2img),
     path('img2img/', views.img2img),
     path('progress/', views.progress),

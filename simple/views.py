@@ -4,10 +4,11 @@ from django.views.decorators.csrf import csrf_exempt
 import time
 import os
 import json
-from init_model import initialize
+from webui_v3 import initialize, text2imgapi, img2imgapi
 import threading
 
 from modules.processing import StableDiffusionProcessingTxt2Img, StableDiffusionProcessingImg2Img, process_images
+from modules.api.models import StableDiffusionTxt2ImgProcessingAPI, StableDiffusionImg2ImgProcessingAPI
 from modules.api.api import encode_pil_to_base64_str
 import modules
 from io import BytesIO
@@ -31,6 +32,56 @@ queue_lock = threading.Lock() # 一台机器只能同时处理一个请求，所
 
 def homepage(request):
     return render(request, "home.html")
+
+@csrf_exempt
+def txt2img_v2(request):
+    raw_req = request.body.decode('utf-8')
+    req_json = json.loads(raw_req)
+    
+    sd_req = StableDiffusionTxt2ImgProcessingAPI(**req_json)
+    resp = text2imgapi(sd_req)
+
+    return JsonResponse(vars(resp))
+
+@csrf_exempt
+def img2img_v2(request):
+    raw_req = request.body.decode('utf-8')
+    req_json = json.loads(raw_req)
+    
+    sd_req = StableDiffusionImg2ImgProcessingAPI(**req_json)
+    resp = img2imgapi(sd_req)
+
+    return JsonResponse(vars(resp))
+
+@csrf_exempt
+def progress_v2(request):
+    raw_req = request.body.decode('utf-8')
+    req_json = json.loads(raw_req)
+    if shared.state.job_count == 0:
+        return JsonResponse({"progress": 0, "eta": 0})
+
+    # avoid dividing zero
+    progress = 0.01
+
+    if shared.state.job_count > 0:
+        progress += shared.state.job_no / shared.state.job_count
+    if shared.state.sampling_steps > 0:
+        progress += 1 / shared.state.job_count * shared.state.sampling_step / shared.state.sampling_steps
+
+    time_since_start = time.time() - shared.state.time_start
+    eta = (time_since_start/progress)
+    eta_relative = eta-time_since_start
+
+    progress = min(progress, 1)
+    return JsonResponse({"progress": progress, "eta": eta_relative})
+
+@csrf_exempt
+def interrupt_v2(request):
+    raw_req = request.body.decode('utf-8')
+    req_json = json.loads(raw_req)
+    shared.state.interrupt()
+    return JsonResponse({"msg": "success"})
+
 
 @csrf_exempt
 def txt2img(request):

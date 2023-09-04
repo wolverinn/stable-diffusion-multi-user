@@ -10,8 +10,11 @@ import subprocess as sp
 from modules import call_queue, shared
 from modules.generation_parameters_copypaste import image_from_url_text
 import modules.images
+from modules.ui_components import ToolButton
+
 
 folder_symbol = '\U0001f4c2'  # 📂
+refresh_symbol = '\U0001f504'  # 🔄
 
 
 def update_generation_info(generation_info, html_info, img_index):
@@ -50,9 +53,10 @@ def save_files(js_data, images, do_make_zip, index):
     save_to_dirs = shared.opts.use_save_to_dirs_for_ui
     extension: str = shared.opts.samples_format
     start_index = 0
+    only_one = False
 
     if index > -1 and shared.opts.save_selected_only and (index >= data["index_of_first_image"]):  # ensures we are looking at a specific non-grid picture, and we have save_selected_only
-
+        only_one = True
         images = [images[index]]
         start_index = index
 
@@ -70,6 +74,7 @@ def save_files(js_data, images, do_make_zip, index):
             is_grid = image_index < p.index_of_first_image
             i = 0 if is_grid else (image_index - p.index_of_first_image)
 
+            p.batch_index = image_index-1
             fullfn, txt_fullfn = modules.images.save_image(image, path, "", seed=p.all_seeds[i], prompt=p.all_prompts[i], extension=extension, info=p.infotexts[image_index], grid=is_grid, p=p, save_to_dirs=save_to_dirs)
 
             filename = os.path.relpath(fullfn, path)
@@ -83,7 +88,10 @@ def save_files(js_data, images, do_make_zip, index):
 
     # Make Zip
     if do_make_zip:
-        zip_filepath = os.path.join(path, "images.zip")
+        zip_fileseed = p.all_seeds[index-1] if only_one else p.all_seeds[0]
+        namegen = modules.images.FilenameGenerator(p, zip_fileseed, p.all_prompts[0], image, True)
+        zip_filename = namegen.apply(shared.opts.grid_zip_filename_pattern or "[datetime]_[[model_name]]_[seed]-[seed_last]")
+        zip_filepath = os.path.join(path, f"{zip_filename}.zip")
 
         from zipfile import ZipFile
         with ZipFile(zip_filepath, "w") as zip_file:
@@ -125,12 +133,12 @@ Requested path was: {f}
 
     with gr.Column(variant='panel', elem_id=f"{tabname}_results"):
         with gr.Group(elem_id=f"{tabname}_gallery_container"):
-            result_gallery = gr.Gallery(label='Output', show_label=False, elem_id=f"{tabname}_gallery").style(grid=4)
+            result_gallery = gr.Gallery(label='Output', show_label=False, elem_id=f"{tabname}_gallery").style(columns=4)
 
         generation_info = None
         with gr.Column():
-            with gr.Row(elem_id=f"image_buttons_{tabname}"):
-                open_folder_button = gr.Button(folder_symbol, elem_id="hidden_element" if shared.cmd_opts.hide_ui_dir_config else f'open_folder_{tabname}')
+            with gr.Row(elem_id=f"image_buttons_{tabname}", elem_classes="image-buttons"):
+                open_folder_button = gr.Button(folder_symbol, visible=not shared.cmd_opts.hide_ui_dir_config)
 
                 if tabname != "extras":
                     save = gr.Button('Save', elem_id=f'save_{tabname}')
@@ -145,11 +153,10 @@ Requested path was: {f}
             )
 
             if tabname != "extras":
-                with gr.Row():
-                    download_files = gr.File(None, file_count="multiple", interactive=False, show_label=False, visible=False, elem_id=f'download_files_{tabname}')
+                download_files = gr.File(None, file_count="multiple", interactive=False, show_label=False, visible=False, elem_id=f'download_files_{tabname}')
 
                 with gr.Group():
-                    html_info = gr.HTML(elem_id=f'html_info_{tabname}')
+                    html_info = gr.HTML(elem_id=f'html_info_{tabname}', elem_classes="infotext")
                     html_log = gr.HTML(elem_id=f'html_log_{tabname}')
 
                     generation_info = gr.Textbox(visible=False, elem_id=f'generation_info_{tabname}')
@@ -160,6 +167,7 @@ Requested path was: {f}
                             _js="function(x, y, z){ return [x, y, selected_gallery_index()] }",
                             inputs=[generation_info, html_info, html_info],
                             outputs=[html_info, html_info],
+                            show_progress=False,
                         )
 
                     save.click(
@@ -195,12 +203,39 @@ Requested path was: {f}
 
             else:
                 html_info_x = gr.HTML(elem_id=f'html_info_x_{tabname}')
-                html_info = gr.HTML(elem_id=f'html_info_{tabname}')
+                html_info = gr.HTML(elem_id=f'html_info_{tabname}', elem_classes="infotext")
                 html_log = gr.HTML(elem_id=f'html_log_{tabname}')
+
+            paste_field_names = []
+            if tabname == "txt2img":
+                paste_field_names = modules.scripts.scripts_txt2img.paste_field_names
+            elif tabname == "img2img":
+                paste_field_names = modules.scripts.scripts_img2img.paste_field_names
 
             for paste_tabname, paste_button in buttons.items():
                 parameters_copypaste.register_paste_params_button(parameters_copypaste.ParamBinding(
-                    paste_button=paste_button, tabname=paste_tabname, source_tabname="txt2img" if tabname == "txt2img" else None, source_image_component=result_gallery
+                    paste_button=paste_button, tabname=paste_tabname, source_tabname="txt2img" if tabname == "txt2img" else None, source_image_component=result_gallery,
+                    paste_field_names=paste_field_names
                 ))
 
             return result_gallery, generation_info if tabname != "extras" else html_info_x, html_info, html_log
+
+
+def create_refresh_button(refresh_component, refresh_method, refreshed_args, elem_id):
+    def refresh():
+        refresh_method()
+        args = refreshed_args() if callable(refreshed_args) else refreshed_args
+
+        for k, v in args.items():
+            setattr(refresh_component, k, v)
+
+        return gr.update(**(args or {}))
+
+    refresh_button = ToolButton(value=refresh_symbol, elem_id=elem_id)
+    refresh_button.click(
+        fn=refresh,
+        inputs=[],
+        outputs=[refresh_component]
+    )
+    return refresh_button
+

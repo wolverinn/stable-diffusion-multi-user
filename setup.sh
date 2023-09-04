@@ -23,8 +23,8 @@ elif [ $1 == "venv" ]; then
     pip3 install -r requirements.txt --extra-index-url https://mirrors.aliyun.com/pypi/simple
     # python3 ./repositories/CLIP/setup.py install
     # python3 ./repositories/open_clip/setup.py install
-    pip3 install torch==1.13.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117
-    pip3 install torchvision==0.14.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117
+    # pip3 install torch==1.13.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117
+    # pip3 install torchvision==0.14.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117
     deactivate
 elif [ $1 == "sd_model" ]; then
     # download models

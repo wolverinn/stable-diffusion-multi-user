@@ -1,15 +1,12 @@
 import base64
-import html
 import io
-import math
+import json
 import os
 import re
-from pathlib import Path
 
 import gradio as gr
 from modules.paths import data_path
 from modules import shared, ui_tempdir, script_callbacks
-import tempfile
 from PIL import Image
 
 re_param_code = r'\s*([\w ]+):\s*("(?:\\"[^,]|\\"|\\|[^\"])+"|[^,]*)(?:,|$)'
@@ -23,13 +20,14 @@ registered_param_bindings = []
 
 
 class ParamBinding:
-    def __init__(self, paste_button, tabname, source_text_component=None, source_image_component=None, source_tabname=None, override_settings_component=None):
+    def __init__(self, paste_button, tabname, source_text_component=None, source_image_component=None, source_tabname=None, override_settings_component=None, paste_field_names=None):
         self.paste_button = paste_button
         self.tabname = tabname
         self.source_text_component = source_text_component
         self.source_image_component = source_image_component
         self.source_tabname = source_tabname
         self.override_settings_component = override_settings_component
+        self.paste_field_names = paste_field_names or []
 
 
 def reset():
@@ -37,20 +35,27 @@ def reset():
 
 
 def quote(text):
-    if ',' not in str(text):
+    if ',' not in str(text) and '\n' not in str(text) and ':' not in str(text):
         return text
 
-    text = str(text)
-    text = text.replace('\\', '\\\\')
-    text = text.replace('"', '\\"')
-    return f'"{text}"'
+    return json.dumps(text, ensure_ascii=False)
+
+
+def unquote(text):
+    if len(text) == 0 or text[0] != '"' or text[-1] != '"':
+        return text
+
+    try:
+        return json.loads(text)
+    except Exception:
+        return text
 
 
 def image_from_url_text(filedata):
     if filedata is None:
         return None
 
-    if type(filedata) == list and len(filedata) > 0 and type(filedata[0]) == dict and filedata[0].get("is_file", False):
+    if type(filedata) == list and filedata and type(filedata[0]) == dict and filedata[0].get("is_file", False):
         filedata = filedata[0]
 
     if type(filedata) == dict and filedata.get("is_file", False):
@@ -58,6 +63,7 @@ def image_from_url_text(filedata):
         is_in_right_dir = ui_tempdir.check_tmp_file(shared.demo, filename)
         assert is_in_right_dir, 'trying to open image file outside of allowed directories'
 
+        filename = filename.rsplit('?', 1)[0]
         return Image.open(filename)
 
     if type(filedata) == list:
@@ -128,17 +134,19 @@ def connect_paste_params_buttons():
                 _js=jsfunc,
                 inputs=[binding.source_image_component],
                 outputs=[destination_image_component, destination_width_component, destination_height_component] if destination_width_component else [destination_image_component],
+                show_progress=False,
             )
 
         if binding.source_text_component is not None and fields is not None:
             connect_paste(binding.paste_button, fields, binding.source_text_component, override_settings_component, binding.tabname)
 
         if binding.source_tabname is not None and fields is not None:
-            paste_field_names = ['Prompt', 'Negative prompt', 'Steps', 'Face restoration'] + (["Seed"] if shared.opts.send_seed else [])
+            paste_field_names = ['Prompt', 'Negative prompt', 'Steps', 'Face restoration'] + (["Seed"] if shared.opts.send_seed else []) + binding.paste_field_names
             binding.paste_button.click(
                 fn=lambda *x: x,
                 inputs=[field for field, name in paste_fields[binding.source_tabname]["fields"] if name in paste_field_names],
                 outputs=[field for field, name in fields if name in paste_field_names],
+                show_progress=False,
             )
 
         binding.paste_button.click(
@@ -146,6 +154,7 @@ def connect_paste_params_buttons():
             _js=f"switch_to_{binding.tabname}",
             inputs=None,
             outputs=None,
+            show_progress=False,
         )
 
 
@@ -246,28 +255,40 @@ Steps: 20, Sampler: Euler a, CFG scale: 7, Seed: 965400086, Size: 512x512, Model
         lines.append(lastline)
         lastline = ''
 
-    for i, line in enumerate(lines):
+    for line in lines:
         line = line.strip()
         if line.startswith("Negative prompt:"):
             done_with_prompt = True
             line = line[16:].strip()
-
         if done_with_prompt:
             negative_prompt += ("" if negative_prompt == "" else "\n") + line
         else:
             prompt += ("" if prompt == "" else "\n") + line
 
+    if shared.opts.infotext_styles != "Ignore":
+        found_styles, prompt, negative_prompt = shared.prompt_styles.extract_styles_from_prompt(prompt, negative_prompt)
+
+        if shared.opts.infotext_styles == "Apply":
+            res["Styles array"] = found_styles
+        elif shared.opts.infotext_styles == "Apply if any" and found_styles:
+            res["Styles array"] = found_styles
+
     res["Prompt"] = prompt
     res["Negative prompt"] = negative_prompt
 
     for k, v in re_param.findall(lastline):
-        v = v[1:-1] if v[0] == '"' and v[-1] == '"' else v
-        m = re_imagesize.match(v)
-        if m is not None:
-            res[k+"-1"] = m.group(1)
-            res[k+"-2"] = m.group(2)
-        else:
-            res[k] = v
+        try:
+            if v[0] == '"' and v[-1] == '"':
+                v = unquote(v)
+
+            m = re_imagesize.match(v)
+            if m is not None:
+                res[f"{k}-1"] = m.group(1)
+                res[f"{k}-2"] = m.group(2)
+            else:
+                res[k] = v
+        except Exception:
+            print(f"Error parsing \"{k}: {v}\"")
 
     # Missing CLIP skip means it was set to 1 (the default)
     if "Clip skip" not in res:
@@ -281,22 +302,62 @@ Steps: 20, Sampler: Euler a, CFG scale: 7, Seed: 965400086, Size: 512x512, Model
         res["Hires resize-1"] = 0
         res["Hires resize-2"] = 0
 
+    if "Hires sampler" not in res:
+        res["Hires sampler"] = "Use same sampler"
+
+    if "Hires prompt" not in res:
+        res["Hires prompt"] = ""
+
+    if "Hires negative prompt" not in res:
+        res["Hires negative prompt"] = ""
+
     restore_old_hires_fix_params(res)
+
+    # Missing RNG means the default was set, which is GPU RNG
+    if "RNG" not in res:
+        res["RNG"] = "GPU"
+
+    if "Schedule type" not in res:
+        res["Schedule type"] = "Automatic"
+
+    if "Schedule max sigma" not in res:
+        res["Schedule max sigma"] = 0
+
+    if "Schedule min sigma" not in res:
+        res["Schedule min sigma"] = 0
+
+    if "Schedule rho" not in res:
+        res["Schedule rho"] = 0
 
     return res
 
 
 settings_map = {}
 
+
+
 infotext_to_setting_name_mapping = [
     ('Clip skip', 'CLIP_stop_at_last_layers', ),
     ('Conditional mask weight', 'inpainting_mask_weight'),
     ('Model hash', 'sd_model_checkpoint'),
     ('ENSD', 'eta_noise_seed_delta'),
+    ('Schedule type', 'k_sched_type'),
+    ('Schedule max sigma', 'sigma_max'),
+    ('Schedule min sigma', 'sigma_min'),
+    ('Schedule rho', 'rho'),
     ('Noise multiplier', 'initial_noise_multiplier'),
     ('Eta', 'eta_ancestral'),
     ('Eta DDIM', 'eta_ddim'),
-    ('Discard penultimate sigma', 'always_discard_next_to_last_sigma')
+    ('Discard penultimate sigma', 'always_discard_next_to_last_sigma'),
+    ('UniPC variant', 'uni_pc_variant'),
+    ('UniPC skip type', 'uni_pc_skip_type'),
+    ('UniPC order', 'uni_pc_order'),
+    ('UniPC lower order final', 'uni_pc_lower_order_final'),
+    ('Token merging ratio', 'token_merging_ratio'),
+    ('Token merging ratio hr', 'token_merging_ratio_hr'),
+    ('RNG', 'randn_source'),
+    ('NGMS', 's_min_uncond'),
+    ('Pad conds', 'pad_cond_uncond'),
 ]
 
 
@@ -388,15 +449,20 @@ def connect_paste(button, paste_fields, input_comp, override_settings_component,
 
             vals_pairs = [f"{k}: {v}" for k, v in vals.items()]
 
-            return gr.Dropdown.update(value=vals_pairs, choices=vals_pairs, visible=len(vals_pairs) > 0)
+            return gr.Dropdown.update(value=vals_pairs, choices=vals_pairs, visible=bool(vals_pairs))
 
         paste_fields = paste_fields + [(override_settings_component, paste_settings)]
 
     button.click(
         fn=paste_func,
-        _js=f"recalculate_prompts_{tabname}",
         inputs=[input_comp],
         outputs=[x[0] for x in paste_fields],
+        show_progress=False,
     )
-
-
+    button.click(
+        fn=None,
+        _js=f"recalculate_prompts_{tabname}",
+        inputs=[],
+        outputs=[],
+        show_progress=False,
+    )

@@ -1,9 +1,25 @@
 # Stable Diffusion Multi-user
-> stable diffusion multi-user django server code with multi-GPU load balancing 
+> stable diffusion multi-user server API deployment that supports autoscaling, webui extension API...
 
-# Features
+Contents:
 
-- a django server that provides stable-diffusion http API, including:
+- [Option-1] Deploy with Django API
+    - Project directory structure
+    - Deploy the GPU server
+        - API definition
+    - Deploy the load-balancing server
+        - Test the load-balancing server locally
+- [Option-2] Deploy using Runpod Serverless
+- [Option-3] Deploy on Replicate
+
+--------
+
+# [Option-1] Deploy with Django API
+
+Features: 
+
+- a server code that provides stable-diffusion http API, including:
+    - CHANGELOG-230904: Support torch2.0, support extension API when calling txt2img&img2img, support all API parameters same as webui
     - txt2img
     - img2img
     - check generating progress
@@ -20,7 +36,7 @@ You can build your own UI, community features, account login&payment, etc. based
 
 ![load balancing](vx_images/516000908230643.jpg)
 
-# Project directory structure
+## Project directory structure
 
 The project can be roughly divided into two parts: django server code, and [stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui) code that we use to initialize and run models. And I'll mainly explain the django server part.
 
@@ -37,7 +53,7 @@ In the main project directory:
 - `setup.sh`: run it with options to setup the server environment
 - `gen_http_conf.py`: called in `setup.sh` to setup the apache configuration
 
-# Deploy on a GPU server
+## Deploy the GPU server
 
 1. SSH to the GPU server
 2. clone or download the repository
@@ -47,9 +63,11 @@ In the main project directory:
     - if you want to change listening ports: change both `/etc/apache2/ports.conf` and `/etc/apache2/sites-available/sd_multi.conf`
 5. restart apache: `sudo service apache2 restart`
 
-## API definition
+### API definition
 
 - `/`: view the homepage, used to test that apache is configured successfully
+- `/txt2img_v2/`: txt2img with the same parameters as sd-webui, also supports extension parameters(such as controlnet)
+- `/img2img_v2/`: img2img with the same parameters as sd-webui, also supports extension parameters(such as controlnet)
 - `/txt2img/`: try the txt2img with stable diffusion
 ```
 // demo request
@@ -121,7 +139,7 @@ task_id: required string
 models: list<string>
 ```
 
-# Deploy the load-balancing server
+## Deploy the load-balancing server
 
 1. SSH to a CPU server
 2. clone or download the repository
@@ -132,7 +150,7 @@ models: list<string>
 7. restart apache: `sudo service apache2 restart`
 8. to test it, view `ip+port/multi_demo/` url path
 
-## Test the load-balancing server locally
+### Test the load-balancing server locally
 If you don't want to deploy the load balancing server but still want to test the functions, you can start the load-balancing server on your local computer.
 
 1. clone or download the repository
@@ -145,5 +163,15 @@ If you don't want to deploy the load balancing server but still want to test the
 
 Finally, you can call your http API(test it using postman).
 
-# Part 2: Deploy using Runpod Serverless
-see `sd-docker-slim`
+# [Option-2] Deploy using Runpod Serverless
+
+Features:
+
+- Autoscaling with highly customized scaling strategy
+- Supports sd-webui API with extensions
+- Supports sd-webui checkpoints, Loras...
+
+see [sd-docker-slim](https://github.com/wolverinn/stable-diffusion-multi-user/tree/master/sd-docker-slim)
+
+# [Option-3] Deploy on Replicate
+todo

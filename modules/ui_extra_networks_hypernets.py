@@ -12,23 +12,19 @@ class ExtraNetworksPageHypernetworks(ui_extra_networks.ExtraNetworksPage):
         shared.reload_hypernetworks()
 
     def list_items(self):
-        for name, path in shared.hypernetworks.items():
+        for index, (name, path) in enumerate(shared.hypernetworks.items()):
             path, ext = os.path.splitext(path)
-            previews = [path + ".png", path + ".preview.png"]
-
-            preview = None
-            for file in previews:
-                if os.path.isfile(file):
-                    preview = self.link_preview(file)
-                    break
 
             yield {
                 "name": name,
                 "filename": path,
-                "preview": preview,
+                "preview": self.find_preview(path),
+                "description": self.find_description(path),
                 "search_term": self.search_terms_from_path(path),
                 "prompt": json.dumps(f"<hypernet:{name}:") + " + opts.extra_networks_default_multiplier + " + json.dumps(">"),
-                "local_preview": path + ".png",
+                "local_preview": f"{path}.preview.{shared.opts.samples_format}",
+                "sort_keys": {'default': index, **self.get_sort_keys(path + ext)},
+
             }
 
     def allowed_directories_for_previews(self):

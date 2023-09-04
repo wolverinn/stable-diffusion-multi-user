@@ -66,9 +66,9 @@ class ScriptPostprocessingRunner:
     def initialize_scripts(self, scripts_data):
         self.scripts = []
 
-        for script_class, path, basedir, script_module in scripts_data:
-            script: ScriptPostprocessing = script_class()
-            script.filename = path
+        for script_data in scripts_data:
+            script: ScriptPostprocessing = script_data.script_class()
+            script.filename = script_data.path
 
             if script.name == "Simple Upscale":
                 continue
@@ -109,7 +109,7 @@ class ScriptPostprocessingRunner:
         inputs = []
 
         for script in self.scripts_in_preferred_order():
-            with gr.Box() as group:
+            with gr.Row() as group:
                 self.create_script_ui(script, inputs)
 
             script.group = group
@@ -124,7 +124,7 @@ class ScriptPostprocessingRunner:
             script_args = args[script.args_from:script.args_to]
 
             process_args = {}
-            for (name, component), value in zip(script.controls.items(), script_args):
+            for (name, _component), value in zip(script.controls.items(), script_args):
                 process_args[name] = value
 
             script.process(pp, **process_args)
