@@ -29,6 +29,7 @@
 - supports multi-user queuing
 - supports multi-user separately changing models, and won't affect each other
 - provides downstream load-balancing server code that automatically do load-balancing among available GPU servers, and ensure that user requests are sent to the same server within one generation cycle
+- can be used to deploy multiple stable-diffusion models in one GPU card to make the full use of GPU, check [this article](https://mp.weixin.qq.com/s/AktAQ7ek8Tkph3uvSeiOVg) for details
 
 You can build your own UI, community features, account login&payment, etc. based on these functions!
 
