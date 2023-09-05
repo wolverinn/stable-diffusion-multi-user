@@ -3,8 +3,10 @@
 # Features
 
 - deploy on runpod serverless
+- autoscaling with highly customized scaling strategy
 - text2img, img2img, list models
 - upload models at any time, takes effect immediately
+- if you want ControlNet&other extensions&up-to-date sd-webui API&torch-2.0, checkout my article [here](https://mp.weixin.qq.com/s/qA3Mehdbi9lrszdmc3-0Yw)
 
 # Deploy Steps
 

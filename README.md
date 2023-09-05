@@ -97,10 +97,17 @@ Finally, you can call your http API(test it using postman).
 Features:
 
 - Autoscaling with highly customized scaling strategy
-- Supports sd-webui API with extensions
 - Supports sd-webui checkpoints, Loras...
+- Docker image separated with model files, upload and replace models anytime you want
 
 see [sd-docker-slim](https://github.com/wolverinn/stable-diffusion-multi-user/tree/master/sd-docker-slim)
 
 # [Option-3] Deploy on Replicate
-todo
+checkout the [article](https://mp.weixin.qq.com/s/VXpYKreYantYpfLsP7PIbA)
+
+Features:
+
+- Autoscaling
+- Docker image with torch 2.0
+- Supports sd-webui API with extensions, API parameters are the same as webui
+- Supports sd-webui checkpoints, Loras...
