@@ -26,6 +26,8 @@ elif [ $1 == "venv" ]; then
     # pip3 install torch==1.13.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117
     # pip3 install torchvision==0.14.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117
     deactivate
+    python3 manage.py makemigrations
+    python3 manage.py migrate
 elif [ $1 == "sd_model" ]; then
     # download models
     wget -P ./models/Stable-diffusion https://huggingface.co/Hardy01/chill_watcher/resolve/main/models/Stable-diffusion/chilloutmix_NiPrunedFp32Fix.safetensors
@@ -44,6 +46,7 @@ elif [ $1 == "apache" ]; then
     find stable-diffusion-multi-user -type d | xargs chmod 755
     chmod g+w stable-diffusion-multi-user
     chmod g+w -R stable-diffusion-multi-user/venv
+    chmod g+w db.sqlite3
     cd /var # pwd = /var
     # 下面两行是因为sd需要在/var/www下创建.cache文件夹进行写入
     chgrp www-data www/
