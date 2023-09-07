@@ -104,7 +104,7 @@ Features:
 see [sd-docker-slim](https://github.com/wolverinn/stable-diffusion-multi-user/tree/master/sd-docker-slim)
 
 # [Option-3] Deploy on Replicate
-checkout the [article](https://mp.weixin.qq.com/s/VXpYKreYantYpfLsP7PIbA)
+A replicate demo is deployed [here](https://replicate.com/wolverinn/webui-api)
 
 Features:
 
@@ -112,3 +112,5 @@ Features:
 - Docker image with torch 2.0
 - Supports sd-webui API with extensions, API parameters are the same as webui
 - Supports sd-webui checkpoints, Loras...
+
+Checkout the [article](https://mp.weixin.qq.com/s/VXpYKreYantYpfLsP7PIbA) for deploy guide.
