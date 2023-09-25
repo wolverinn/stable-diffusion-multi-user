@@ -113,4 +113,6 @@ Features:
 - Supports sd-webui API with extensions, API parameters are the same as webui
 - Supports sd-webui checkpoints, Loras...
 
+Code: https://github.com/wolverinn/stable-diffusion-multi-user/releases/tag/v1.1
+
 Checkout the [article](https://mp.weixin.qq.com/s/VXpYKreYantYpfLsP7PIbA) for deploy guide.
