@@ -12,8 +12,6 @@
 
 --------
 
-## > 补充：字节跳动研发岗位内推：https://job.toutiao.com/s/idrqhQ2e ，不限级别多种岗位，北/上/杭/成都有base，也可邮件联系
-
 # [Option-1] Deploy with Django API
 
 **Features**: 
