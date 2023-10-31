@@ -18,6 +18,7 @@ from PIL import Image
 
 # Create your views here.
 
+os.environ["IGNORE_CMD_ARGS_ERRORS"] = "true"
 initialize()
 queue_lock = threading.Lock() # 一台机器只能同时处理一个请求，所以这个lock是全局的
 
