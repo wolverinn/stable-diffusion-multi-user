@@ -103,6 +103,8 @@ Features:
 
 see [sd-docker-slim](https://github.com/wolverinn/stable-diffusion-multi-user/tree/master/sd-docker-slim)
 
+or checkout the [article](https://mp.weixin.qq.com/s/gMa1MYU5TrhBbsjwlBTb5Q), no need to code at all, only need to upload models.
+
 # [Option-3] Deploy on Replicate
 A replicate demo is deployed [here](https://replicate.com/wolverinn/webui-api)
 
