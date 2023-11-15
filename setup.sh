@@ -26,6 +26,7 @@ elif [ $1 == "venv" ]; then
     # pip3 install torch==1.13.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117
     # pip3 install torchvision==0.14.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117
     deactivate
+    export IGNORE_CMD_ARGS_ERRORS="true"
     python3 manage.py makemigrations
     python3 manage.py migrate
 elif [ $1 == "sd_model" ]; then
