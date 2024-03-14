@@ -6,7 +6,7 @@
 - autoscaling with highly customized scaling strategy
 - text2img, img2img, list models API
 - upload models at any time, takes effect immediately
-- if you want ControlNet&other extensions & up-to-date sd-webui features & full webui API support & torch-2.2, I've packed a docker image ready to use, checkout my article [here](https://mp.weixin.qq.com/s/qA3Mehdbi9lrszdmc3-0Yw)
+- if you want ControlNet&other extensions & up-to-date sd-webui features & full webui API support & torch-2.2, I've packed a docker image ready to use, checkout my article [here](https://mp.weixin.qq.com/s/gMa1MYU5TrhBbsjwlBTb5Q)
 
 # Deploy Steps
 
