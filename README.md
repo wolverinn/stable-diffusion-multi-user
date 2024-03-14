@@ -103,9 +103,7 @@ Features:
 - Supports sd-webui checkpoints, Loras...
 - Docker image separated with model files, upload and replace models anytime you want
 
-see [sd-docker-slim](https://github.com/wolverinn/stable-diffusion-multi-user/tree/master/sd-docker-slim)
-
-or checkout the [article](https://juejin.cn/post/7299028570037714955), no need to code at all, only need to upload models.
+see [sd-docker-slim](https://github.com/wolverinn/stable-diffusion-multi-user/tree/master/sd-docker-slim) for deploy guide and also a ready-to-use docker image.
 
 # [Option-3] Deploy on Replicate
 A replicate demo is deployed [here](https://replicate.com/wolverinn/webui-api)
@@ -113,10 +111,32 @@ A replicate demo is deployed [here](https://replicate.com/wolverinn/webui-api)
 Features:
 
 - Autoscaling
-- Docker image with torch 2.0
-- Supports sd-webui API with extensions, API parameters are the same as webui
+- latest sd-webui source code, latest torch&cuda version
+- Docker image with torch 2.2
+- Supports sd-webui API with extensions
 - Supports sd-webui checkpoints, Loras...
 
-Code: https://github.com/wolverinn/stable-diffusion-multi-user/releases/tag/v1.1
+Deploy steps:
 
-Checkout the [article](https://juejin.cn/post/7298642789078974515) for deploy guide.
+1. create a model on (replicate)(https://replicate.com)
+2. get a Linux GPU machine with 50GB disk space
+3. clone the repository: 
+
+```
+git clone https://github.com/wolverinn/stable-diffusion-multi-user.git
+cd stable-diffusion-multi-user/replicate-cog-slim/
+```
+
+4. modify line-30 in `replicate-cog-slim/cog.yaml` to your own replicate model
+5. [optional] modify `replicate-cog-slim/predicy.py`'s `predict()` function for custom API inputs & outputs
+6. install cog: https://replicate.com/docs/guides/push-a-model
+7. install docker: https://docs.docker.com/engine/install/ubuntu/#set-up-the-repository
+8. download the checkpoints/Lora/extensions/other models you want to deploy to corresponding directories under `replicate-cog-slim/`
+9. run commands:
+
+```
+cog login
+cog push
+```
+
+Then you can see your model on replicate, and you can use it via API or replicate website.

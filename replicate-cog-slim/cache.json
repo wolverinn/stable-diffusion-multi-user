@@ -1,0 +1,15 @@
+{
+    "hashes": {
+        "checkpoint/chilloutmix_NiPrunedFp32Fix.safetensors": {
+            "mtime": 1677026759.8744583,
+            "sha256": "fc2511737a54c5e80b89ab03e0ab4b98d051ab187f92860f3cd664dc9d08b271"
+        }
+    },
+    "safetensors-metadata": {
+        "checkpoint/chilloutmix_NiPrunedFp32Fix.safetensors": {
+            "mtime": 1677026759.8744583,
+            "value": {}
+        }
+    },
+    "extensions-git": {}
+}

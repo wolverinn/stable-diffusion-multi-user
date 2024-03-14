@@ -1,0 +1,2 @@
+chinese dragon, cartoon, 4k, masterpiece
+Steps: 25, Sampler: DPM++ 2M SDE Karras, CFG scale: 7, Seed: 481945960, Size: 512x512, Model hash: fc2511737a, Model: chilloutmix_NiPrunedFp32Fix, Version: v1.6.0

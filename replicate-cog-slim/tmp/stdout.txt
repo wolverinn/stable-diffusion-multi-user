@@ -1,0 +1,8 @@
+ 驱动器 C 中的卷是 OS
+ 卷的序列号是 5238-D1D1
+
+ C:\Users\wolvz\Desktop\GitHub\stable-diffusion-webui-master\venv\Scripts 的目录
+
+2023/07/12  22:28           263,120 python.exe
+               1 个文件        263,120 字节
+               0 个目录 129,363,595,264 可用字节
